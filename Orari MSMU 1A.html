@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orari MSMU 1A</title>
+<style>
+:root{--bg:#f4f5f5;--card:#fff;--ink:#1c2626;--mut:#667070;--line:#d9dede;--L:#d6d6d6;--Lt:#1c2626;--S:#6f6f6f;--St:#fff;--acc:#0e7c7b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1717;--card:#172121;--ink:#e8f0f0;--mut:#93a3a3;--line:#2a3838;--L:#a4adad;--Lt:#101818;--S:#4a5454;--acc:#4cc3c1}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 18px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:560px;margin:0 auto;padding:20px 14px 40px}
+h1{margin:0 0 14px;font-size:24px}
+.tabs{display:flex;gap:6px;margin-bottom:18px}
+.tab{flex:1;padding:12px 0;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;font:600 16px inherit;font-family:inherit;cursor:pointer}
+.tab[aria-selected=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+.tab:focus-visible{outline:3px solid #e8a317;outline-offset:2px}
+h2{margin:0 0 14px;font-size:22px}
+.card{border-radius:16px;padding:18px 20px;margin-bottom:12px}
+.card.L{background:var(--L);color:var(--Lt)}
+.card.S{background:var(--S);color:var(--St)}
+.kind{font-size:15px;font-weight:700}
+.name{font-size:28px;font-weight:800;margin:2px 0}
+.info{font-size:18px}
+.empty{padding:30px 10px;text-align:center;color:var(--mut)}
+.leg{display:flex;gap:18px;margin-top:22px;color:var(--mut);font-size:15px}
+.leg i{display:inline-block;width:16px;height:16px;border-radius:4px;vertical-align:-3px;margin-right:6px;border:1px solid rgba(0,0,0,.25)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Orari im</h1>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <h2 id="title"></h2>
+  <div id="list"></div>
+  <div class="leg"><span><i style="background:var(--L)"></i>Leksion</span><span><i style="background:var(--S)"></i>Seminar</span></div>
+</main>
+<script>
+const DAYS=["E hënë","E martë","E mërkurë","E enjte","E premte"],SH=["Hën","Mar","Mër","Enj","Pre"],TY={L:"Leksion",S:"Seminar"};
+const B=[
+ {d:0,s:8,e:10,t:"L",n:"VepShEnUj",r:"FIMIF 127"},{d:0,s:10,e:12,t:"S",n:"VepShEnUj",r:"FIMIF 127"},
+ {d:1,s:8,e:10,t:"L",n:"BioUji",r:"ENB 206"},{d:1,s:10,e:12,t:"S",n:"BioUji",r:"ENB 206"},
+ {d:2,s:12,e:14,t:"L",n:"GjeotMjed",r:"BA 210"},{d:2,s:14,e:16,t:"S",n:"GjeotMjed",r:"BA 210"},
+ {d:3,s:8,e:10,t:"L",n:"SisPellUji",r:"Lab"},{d:3,s:10,e:12,t:"S",n:"SisPellUji",r:"Lab"},
+ {d:3,s:12,e:14,t:"L",n:"NjStrNd",r:"ENB 207"},
+ {d:4,s:8,e:9,t:"L",n:"NjStrNd",r:"ENB 207"},
+ {d:4,s:12,e:14,t:"L",n:"DinUjiNen",r:"ENB 201"},{d:4,s:14,e:16,t:"S",n:"DinUjiNen",r:"ENB 201"}
+];
+const p2=n=>String(n).padStart(2,"0");
+const today=(new Date().getDay()+6)%7;
+function firstDay(){const h=new Date().getHours();for(let k=0;k<7;k++){const d=(today+k)%7;if(d>4)continue;if(B.some(x=>x.d===d&&(k>0||x.e>h)))return d}return 0}
+let sel=firstDay();
+function show(){
+  const tabs=document.getElementById("tabs");tabs.innerHTML="";
+  SH.forEach((s,i)=>{const b=document.createElement("button");b.className="tab";b.textContent=s;
+    b.setAttribute("role","tab");b.setAttribute("aria-selected",i===sel);b.setAttribute("aria-label",DAYS[i]);
+    b.onclick=()=>{sel=i;show()};tabs.append(b)});
+  document.getElementById("title").textContent=(["Sot, ","Nesër, "][(sel-today+7)%7]||"")+DAYS[sel];
+  const L=document.getElementById("list"),items=B.filter(x=>x.d===sel);
+  L.innerHTML=items.length?"":'<div class="empty">Nuk ke orë këtë ditë.</div>';
+  items.forEach(x=>{const c=document.createElement("div");c.className="card "+x.t;
+    c.innerHTML=`<div class="kind">${TY[x.t]}</div><div class="name">${x.n}</div><div class="info">${p2(x.s)}:00–${p2(x.e)}:00 · ${x.r}</div>`;
+    L.append(c)});
+}
+show();
+</script>
+</body>
+</html>
